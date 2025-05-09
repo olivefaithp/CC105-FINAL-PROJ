@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Dashboard</h2>
+
+<div style="display: flex; gap: 30px; flex-wrap: wrap;">
+  <div>
+    <h3>Summary</h3>
+    <p><strong>Total Predictions:</strong> {{ total }}</p>
+    <p><strong>Approved:</strong> {{ approved }}</p>
+    <p><strong>Rejected:</strong> {{ rejected }}</p>
+    <p><strong>Total Users:</strong> {{ user_count }}</p>
+  </div>
+
+  <div>
+    <h3>Prediction Distribution</h3>
+    <canvas id="predictionChart" width="300" height="300"></canvas>
+  </div>
+</div>
+
+<hr>
+<h3>Recent Prediction Logs</h3>
+<table border="1" cellpadding="8">
+  <tr>
+    <th>Date</th>
+    <th>User</th>
+    <th>LoanAmount</th>
+    <th>Term</th>
+    <th>Credit</th>
+    <th>Income</th>
+    <th>Result</th>
+  </tr>
+  {% for r in records %}
+  <tr>
+    <td>{{ r.created_at|date:"Y-m-d H:i" }}</td>
+    <td>{{ r.user.username }}</td>
+    <td>{{ r.LoanAmount }}</td>
+    <td>{{ r.Loan_Amount_Term }}</td>
+    <td>{{ r.Credit_History }}</td>
+    <td>{{ r.TotalIncome }}</td>
+    <td>{{ r.Prediction }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('predictionChart').getContext('2d');
+    const approved = parseInt("{{ approved|default:0 }}");
+    const rejected = parseInt("{{ rejected|default:0 }}");
+
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Approved', 'Rejected'],
+        datasets: [{
+          data: [approved, rejected],
+          backgroundColor: ['#4CAF50', '#F44336']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
